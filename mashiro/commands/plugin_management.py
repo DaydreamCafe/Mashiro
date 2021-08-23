@@ -10,7 +10,7 @@ from mashiro.utils.plugin_manager import MashiroPlugin
 disabled_command_list = list()
 
 # 初始化命令
-with open('./data/plugins/disabled_plugin', 'r', encoding='utf8') as f:
+with open('./data/plugins/disabled_plugin.json', 'r', encoding='utf8') as f:
     # 被禁用的插件列表
     disabled_plugin_list = json.loads(f.read())
 # 插件列表

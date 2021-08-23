@@ -13,9 +13,9 @@ class MessageStack:
     def __init__(self, sender):
         _config = MashiroConfig().read()
         # 初始化栈深度
-        self.stack_depth = _config['SendingStackDepth']
+        self.stack_depth = _config['MashiroConfig']['SendingStackDepth']
         # 初始化发送间隔
-        self.interval = 1
+        self.interval = _config['MashiroConfig']['SendingInterval']
         # 初始化栈
         self.stack = list()
         # 发送器方法，来自于websocket提供的send()方法

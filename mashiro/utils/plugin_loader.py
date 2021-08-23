@@ -45,12 +45,12 @@ class PluginLoader:
                 if name == metadata['main_module'][2:-3]:
                     logging.info('Loading plugin: {}'.format(plugin['plugin_name']))
                     loader = finder.find_module(name)
-                    plugin = loader.load_module(name)
+                    plugin_ = loader.load_module(name)
                     logging.info('Loaded plugin: {}'.format(plugin['plugin_name']))
 
                     # 初始化插件
                     try:
-                        plugin.init_plugin()
+                        plugin_.init_plugin()
                         logging.info('Initialized plugin: {}'.format(plugin['plugin_name']))
                     except NameError:
                         logging.info('No initialization function found in plugin: {}, skipped'
@@ -59,7 +59,7 @@ class PluginLoader:
                     # 注册插件
                     logging.info('Registering plugin {}'.format(metadata['plugin_id']))
                     try:
-                        commands_list = [command['command'] for command in plugin.command_register]
+                        commands_list = [command['command'] for command in plugin_.command_register]
                     except AttributeError:
                         commands_list = []
                     plugin_list.append({
@@ -71,7 +71,7 @@ class PluginLoader:
                     try:
                         on_start_func.append({
                             'plugin_id': metadata['plugin_id'],
-                            'target_func': plugin.on_start,
+                            'target_func': plugin_.on_start,
                         })
                         logging.info('Registering on start func(PluginID:{})'.format(metadata['plugin_id']))
                     except AttributeError:
@@ -79,9 +79,9 @@ class PluginLoader:
 
                     # 注册指令
                     try:
-                        if plugin.command_register:
+                        if plugin_.command_register:
                             logging.info('Registering on message func(PluginID:{})'.format(metadata['plugin_id']))
-                            for command in plugin.command_register:
+                            for command in plugin_.command_register:
                                 # 注册钩子指令
                                 if command['type'] == 'trigger':
                                     if not ('max_time' in command.keys()):

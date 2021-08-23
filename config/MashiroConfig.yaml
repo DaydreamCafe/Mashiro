@@ -1,0 +1,24 @@
+cqhttpConfig:
+  IpAddress: "192.168.0.100"
+  Port: 6700
+  Token: ""
+
+MashiroConfig:
+  ReactGroup: 798131705
+  SendingStackDepth: 10
+  SendingInterval: 1
+
+ParseConfig:
+  Parser: "BuiltIn"
+
+CommandConfig:
+  CommandIdentifier:
+    - "!!"
+    - "！！"
+  MaxResponseTime: 6
+
+PluginConfig:
+  PluginPath: "./plugins"
+
+DebugConfig:
+  LogLevel: "warning"

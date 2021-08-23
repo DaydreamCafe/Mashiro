@@ -90,9 +90,16 @@ class MashiroPlugin:
         # 遍历插件文件夹
         plugin_list = os.listdir(self.plugin_path)
 
+        # 去除列表中的文件夹
+        for file in plugin_list:
+            if not file.endswith('.Mashiro'):
+                del plugin_list[plugin_list.index(file)]
+
         # 安装
         for i in range(0, len(plugin_list)):
-            self.install(plugin_list[i][:-8])
+            print(plugin_list)
+            print(plugin_list[i][0:-8])
+            self.install(plugin_list[i][0:-8])
 
     def uninstall(self, plugin_name):
         """卸载插件"""

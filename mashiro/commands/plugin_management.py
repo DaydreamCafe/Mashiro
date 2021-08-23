@@ -32,7 +32,7 @@ def disable(client: Interface):
                 # 重写已安装插件列表
                 plugin.write_plugin_list(plugin_list)
                 # 重写禁用列表
-                with open('./data/plugins/disabled_plugin', 'w', encoding='utf8') as f:
+                with open('./data/plugins/disabled_plugin.json', 'w', encoding='utf8') as f:
                     # 被禁用的插件列表
                     f.write(json.dumps(disabled_plugin_list))
                 # 回显

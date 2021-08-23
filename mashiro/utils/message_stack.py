@@ -26,7 +26,7 @@ class MessageStack:
         if self.stack_depth == 0 or len(self.stack) <= self.stack_depth:
             self.stack.append(msg)
 
-    def run(self):
+    def __run(self):
         """开始处理消息栈"""
         def send_msg():
             """在一个新线程里跑"""

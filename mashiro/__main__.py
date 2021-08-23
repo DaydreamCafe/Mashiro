@@ -12,13 +12,13 @@ class Mashiro:
     def run():
         """启动go-cqhttps的守护进程"""
 
-        # 设置日志格式
-        log_format = "%(asctime)s - %(levelname)s - %(message)s"
-        date_format = "%m/%d/%Y %H:%M:%S %p"
-        logging.basicConfig(filename='my.log', level=logging.DEBUG, format=log_format, datefmt=date_format)
-
         # 启动client线程
         def _run_client():
+            # 设置日志格式
+            log_format = "%(asctime)s - %(levelname)s - %(message)s"
+            date_format = "%m/%d/%Y %H:%M:%S %p"
+            logging.basicConfig(filename='my.log', level=logging.DEBUG, format=log_format, datefmt=date_format)
+
             _config = MashiroConfig().read()
             client = CqHttpClient(_config['MashiroConfig']['ReactGroup'], _config['cqhttpConfig']['IpAddress'],
                                   _config['cqhttpConfig']['Port'], _config['cqhttpConfig']['Token'])

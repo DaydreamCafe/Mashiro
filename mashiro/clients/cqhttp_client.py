@@ -69,7 +69,7 @@ class CqHttpClient(websocket.WebSocketApp):
     def run(self):
         def on_start_thread(*args):
             """插件on_start函数线程启动函数"""
-            args[0](args[1])
+            args[0]['target_func'](args[1])
 
         # 启动on_start函数线程
         for on_start_func in self.on_start_func:

@@ -6,8 +6,11 @@ from mashiro.utils.config import MashiroConfig
 
 
 class Parser:
-    """没什么卵用的解析器类，但是不能删"""
+    """用于编码提示的、没什么卵用的解析器类，但是不能删"""
     def __init__(self):
+        pass
+
+    def parse(self, data):
         pass
 
 

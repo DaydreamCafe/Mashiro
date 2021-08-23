@@ -97,8 +97,6 @@ class MashiroPlugin:
 
         # 安装
         for i in range(0, len(plugin_list)):
-            print(plugin_list)
-            print(plugin_list[i][0:-8])
             self.install(plugin_list[i][0:-8])
 
     def uninstall(self, plugin_name):

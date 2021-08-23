@@ -20,6 +20,11 @@ from mashiro.utils.config import MashiroConfig
 
 class CqHttpClient(websocket.WebSocketApp):
     def __init__(self, react_group_id: int, ip: str, port: int, token: str):
+        # 初始化log模块
+        log_format = "%(asctime)s - %(levelname)s - %(message)s"
+        date_format = "%m/%d/%Y %H:%M:%S %p"
+        logging.basicConfig(filename='my.log', level=logging.DEBUG, format=log_format, datefmt=date_format)
+
         # Websocket基本设置
         self.ws_address = ip
         self.ws_port = port

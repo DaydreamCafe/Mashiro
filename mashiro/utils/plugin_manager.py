@@ -3,12 +3,12 @@
 管理插件的类
 """
 import json
-import logging
 import os
 import shutil
 import zipfile
 
 from mashiro.utils.config import MashiroConfig
+from mashiro.utils.logger import Logger
 
 
 class MashiroPlugin:
@@ -17,6 +17,8 @@ class MashiroPlugin:
     """
 
     def __init__(self):
+        self.logger = Logger('plugin_manager.py')
+
         _config = MashiroConfig().read()
         self.plugin_path = _config['PluginConfig']['PluginPath']
         self.plugin_temp_path = './temp'
@@ -36,7 +38,7 @@ class MashiroPlugin:
     def install(self, plugin_name):
         """安装插件"""
         path = os.path.join(self.plugin_path, plugin_name) + '.Mashiro'
-        logging.info('Now installing plugin {}'.format(plugin_name))
+        self.logger.info('Now installing plugin {}'.format(plugin_name))
 
         # 解压插件到临时文件夹
         if os.path.exists(self.plugin_temp_path):
@@ -76,10 +78,10 @@ class MashiroPlugin:
             installed_plugin_list.append(plugin_metadata)
             self.write_plugin_list(installed_plugin_list)
 
-            logging.info('Successfully installed plugin: {}(ID:{})'.format(plugin_name, plugin_metadata['plugin_id']))
+            self.logger.info('Successfully installed plugin: {}(ID:{})'.format(plugin_name, plugin_metadata['plugin_id']))
         else:
             # 已安装时跳过安装
-            logging.info('Already installed plugin {}(ID:{}),skipped the installation'
+            self.logger.info('Already installed plugin {}(ID:{}),skipped the installation'
                          .format(plugin_name, plugin_metadata['plugin_id']))
 
         # 清理
@@ -118,9 +120,9 @@ class MashiroPlugin:
                     self.write_plugin_list(installed_plugin_list)
                     existence = True
             if not existence:
-                logging.warning('Plugin {} is not installed,skipped uninstallation'.format(plugin_name))
+                self.logger.warning('Plugin {} is not installed,skipped uninstallation'.format(plugin_name))
         else:
-            logging.warning('No installed plugin')
+            self.logger.warning('No installed plugin')
 
     def uninstall_all(self):
         """卸载所有插件"""
@@ -137,16 +139,16 @@ class MashiroPlugin:
             # 从插件列表移除
             self.write_plugin_list([])
         else:
-            logging.warning('No installed plugin')
+            self.logger.warning('No installed plugin')
 
     def reinstall(self, plugin_name):
         """重新安装插件"""
         self.uninstall(plugin_name)
         self.install(plugin_name)
-        logging.info('Reinstalled plugin {}'.format(plugin_name))
+        self.logger.info('Reinstalled plugin {}'.format(plugin_name))
 
     def reinstall_all(self):
         """重新安装所有插件"""
         self.uninstall_all()
         self.install_all()
-        logging.info('Reinstalled all plugins')
+        self.logger.info('Reinstalled all plugins')

@@ -1,10 +1,13 @@
 # -*- coding:utf-8 -*-
 """插件管理相关"""
 import json
-import logging
 
 from mashiro.api.interface import Interface
 from mashiro.utils.plugin_manager import MashiroPlugin
+from mashiro.utils.logger import Logger
+
+# 初始化Logger
+logger = Logger('plugin_management.py')
 
 # 被禁用的指令列表
 disabled_command_list = list()
@@ -44,7 +47,7 @@ def disable(client: Interface):
                     }
                 }
                 client.send(reply)
-                logging.info('Disabled plugin {}'.format(client.args[2]))
+                logger.info('Disabled plugin {}'.format(client.args[2]))
         if not existence:
             reply = {
                 "action": "send_group_msg",
@@ -54,7 +57,7 @@ def disable(client: Interface):
                 }
             }
             client.send(reply)
-            logging.warning('Failed to disable plugin {}, because the plugin was not loaded'.format(client.args[2]))
+            logger.warning('Failed to disable plugin {}, because the plugin was not loaded'.format(client.args[2]))
 
     # TODO: 禁用指令
 

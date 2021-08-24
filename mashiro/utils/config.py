@@ -5,27 +5,29 @@
 """
 import sys
 import yaml
-import logging
+
+from mashiro.utils.logger import Logger
 
 
 class __Config:
     """配置文件的抽象类"""
     def __init__(self):
+        # 初始化logger
+        self.logger = Logger('config.py')
         self.config_path = ''
-        logging.info('Setting config file path to {}'.format(self.config_path))
 
     def read(self) -> dict:
         """加载配置文件，返回配置文件字典"""
-        logging.info('Trying to load config file: {}'.format(self.config_path))
+        self.logger.debug('Trying to load config file: {}'.format(self.config_path))
         try:
             with open(self.config_path, 'r', encoding='utf8') as f:
                 config = yaml.load(f, Loader=yaml.FullLoader)
 
         except FileNotFoundError:
-            logging.error('Config file {} does not exists'.format(self.config_path))
+            self.logger.error('Config file {} does not exists'.format(self.config_path))
             sys.exit(1)
 
-        logging.info('Loaded config file: {}'.format(self.config_path))
+        self.logger.debug('Loaded config file: {}'.format(self.config_path))
         return config
 
 

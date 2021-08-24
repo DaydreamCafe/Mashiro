@@ -3,18 +3,20 @@
 插件加载器
 """
 import json
-import logging
 import os
 import pkgutil
 
 from mashiro.utils.config import MashiroConfig
 from mashiro.utils.plugin_manager import MashiroPlugin
+from mashiro.utils.logger import Logger
 
 
 class PluginLoader:
     """插件加载器"""
 
     def __init__(self):
+        self.logger = Logger('plugin_loader.py')
+
         _config = MashiroConfig().read()
         self.plugin_path = _config['PluginConfig']['PluginPath']
         self.default_max_time = _config['CommandConfig']['MaxResponseTime']
@@ -43,21 +45,21 @@ class PluginLoader:
                 with open(os.path.join(plugin_path, 'metadata.json')) as f:
                     metadata = json.loads(f.read())
                 if name == metadata['main_module'][2:-3]:
-                    logging.info('Loading plugin: {}'.format(plugin['plugin_name']))
+                    self.logger.info('Loading plugin: {}'.format(plugin['plugin_name']))
                     loader = finder.find_module(name)
                     plugin_ = loader.load_module(name)
-                    logging.info('Loaded plugin: {}'.format(plugin['plugin_name']))
+                    self.logger.info('Loaded plugin: {}'.format(plugin['plugin_name']))
 
                     # 初始化插件
                     try:
                         plugin_.init_plugin()
-                        logging.info('Initialized plugin: {}'.format(plugin['plugin_name']))
+                        self.logger.info('Initialized plugin: {}'.format(plugin['plugin_name']))
                     except NameError:
-                        logging.info('No initialization function found in plugin: {}, skipped'
+                        self.logger.info('No initialization function found in plugin: {}, skipped'
                                      .format(plugin['plugin_name']))
 
                     # 注册插件
-                    logging.info('Registering plugin {}'.format(metadata['plugin_id']))
+                    self.logger.info('Registering plugin {}'.format(metadata['plugin_id']))
                     try:
                         commands_list = [command['command'] for command in plugin_.command_register]
                     except AttributeError:
@@ -73,14 +75,14 @@ class PluginLoader:
                             'plugin_id': metadata['plugin_id'],
                             'target_func': plugin_.on_start,
                         })
-                        logging.info('Registering on start func(PluginID:{})'.format(metadata['plugin_id']))
+                        self.logger.info('Registering on start func(PluginID:{})'.format(metadata['plugin_id']))
                     except AttributeError:
                         pass
 
                     # 注册指令
                     try:
                         if plugin_.command_register:
-                            logging.info('Registering on message func(PluginID:{})'.format(metadata['plugin_id']))
+                            self.logger.info('Registering on message func(PluginID:{})'.format(metadata['plugin_id']))
                             for command in plugin_.command_register:
                                 # 注册钩子指令
                                 if command['type'] == 'trigger':

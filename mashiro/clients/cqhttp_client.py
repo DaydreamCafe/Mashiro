@@ -101,52 +101,55 @@ class CqHttpClient(websocket.WebSocketApp):
         try:
             # 解析原始数据
             raw_msg, args = self.parser.parse(message)
-            # 初始化专用插件接口
-            client = Interface(react_group=self.react_group_id, add_msg=self.msg_stack.add, close=exit,
-                               on_message_func=self.on_active_command, plugin_list=self.plugin_list,
-                               load_plugin=self.load_plugins, args=args, raw_msg=raw_msg)
-            # 设置通用接口
-            self.client.set_args__(args)
-            self.client.set_raw_msg__(raw_msg)
 
-            # 调用内置指令
-            if args[0] in built_in.registered_command.keys():
-                @func_timeout.func_set_timeout(MashiroConfig().read()['CommandConfig']['MaxResponseTime'])
-                def run_command():
-                    built_in.registered_command[args[0]](client)
+            # 判断是否来自目标群组
+            if raw_msg['group_id'] == self.react_group_id:
+                # 初始化专用插件接口
+                client = Interface(react_group=self.react_group_id, add_msg=self.msg_stack.add, close=exit,
+                                   on_message_func=self.on_active_command, plugin_list=self.plugin_list,
+                                   load_plugin=self.load_plugins, args=args, raw_msg=raw_msg)
+                # 设置通用接口
+                self.client.set_args__(args)
+                self.client.set_raw_msg__(raw_msg)
 
-                try:
-                    run_command()
-                except func_timeout.exceptions.FunctionTimedOut:
-                    self.logger.warning('[WatchDog]Killed processing command {}'.format(args[0]))
-
-            # 调用钩子指令
-            for command in self.on_trigger_command:
-                if command['command'] == args[0]:
-                    @func_timeout.func_set_timeout(command['max_time'])
+                # 调用内置指令
+                if args[0] in built_in.registered_command.keys():
+                    @func_timeout.func_set_timeout(MashiroConfig().read()['CommandConfig']['MaxResponseTime'])
                     def run_command():
-                        command['target_func'](client)
+                        built_in.registered_command[args[0]](client)
 
                     try:
                         run_command()
                     except func_timeout.exceptions.FunctionTimedOut:
                         self.logger.warning('[WatchDog]Killed processing command {}'.format(args[0]))
 
-            # 调用主动式指令
-            for command in self.on_active_command:
-                def command_thread():
-                    @func_timeout.func_set_timeout(command['max_time'])
-                    def _run_command():
-                        command['target_func'](client)
+                # 调用钩子指令
+                for command in self.on_trigger_command:
+                    if command['command'] == args[0]:
+                        @func_timeout.func_set_timeout(command['max_time'])
+                        def run_command():
+                            command['target_func'](client)
 
-                    try:
-                        _run_command()
-                    except func_timeout.exceptions.FunctionTimedOut:
-                        self.logger.warning('[WatchDog]Killed processing command {}'.format(args[0]))
+                        try:
+                            run_command()
+                        except func_timeout.exceptions.FunctionTimedOut:
+                            self.logger.warning('[WatchDog]Killed processing command {}'.format(args[0]))
 
-                thread = threading.Thread(target=command_thread)
-                thread.setDaemon(True)
-                thread.start()
+                # 调用主动式指令
+                for command in self.on_active_command:
+                    def command_thread():
+                        @func_timeout.func_set_timeout(command['max_time'])
+                        def _run_command():
+                            command['target_func'](client)
+
+                        try:
+                            _run_command()
+                        except func_timeout.exceptions.FunctionTimedOut:
+                            self.logger.warning('[WatchDog]Killed processing command {}'.format(args[0]))
+
+                    thread = threading.Thread(target=command_thread)
+                    thread.setDaemon(True)
+                    thread.start()
 
         except TypeError:
             # 尚不明确错误原因

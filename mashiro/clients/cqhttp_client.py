@@ -5,6 +5,7 @@ cqhttp的客户端
 import sys
 import threading
 import time
+import json
 
 import func_timeout
 import websocket
@@ -17,6 +18,7 @@ from mashiro.api.interface import Interface
 from mashiro.utils.message_stack import MessageStack
 from mashiro.commands import built_in
 from mashiro.utils.config import MashiroConfig
+from mashiro.utils.command_thread import run_command
 
 
 class CqHttpClient(websocket.WebSocketApp):
@@ -38,7 +40,7 @@ class CqHttpClient(websocket.WebSocketApp):
 
         # 连接至Websocket服务器
         self.logger.info('Now connecting to {}'.format(url))
-        super().__init__(url, on_message=self.on_message)
+        super().__init__(url, on_message=self.on_message, on_open=self.on_open)
 
         # 加载字符串解析器
         self.logger.debug('Parser loading phase')
@@ -93,17 +95,20 @@ class CqHttpClient(websocket.WebSocketApp):
 
         # 启动go-cqhttp连接
         time.sleep(0.1)
-        self.logger.debug('Start running go-cqhttp client')
+        self.logger.debug('Starting to run go-cqhttp client')
         self.run_forever()
+
+    def on_open(self):
+        self.logger.info('Client started')
 
     def on_message(self, _, message):
         """消息调起的函数"""
-        try:
-            # 解析原始数据
-            raw_msg, args = self.parser.parse(message)
+        data = json.loads(message)
+        if 'post_type' in data.keys() and data['post_type'] == 'message' and data['group_id'] == self.react_group_id:
+            try:
+                # 解析原始数据
+                raw_msg, args = self.parser.parse(data)
 
-            # 判断是否来自目标群组
-            if raw_msg['group_id'] == self.react_group_id:
                 # 初始化专用插件接口
                 client = Interface(react_group=self.react_group_id, add_msg=self.msg_stack.add, close=exit,
                                    on_message_func=self.on_active_command, plugin_list=self.plugin_list,
@@ -114,33 +119,11 @@ class CqHttpClient(websocket.WebSocketApp):
 
                 # 调用内置指令
                 if args[0] in built_in.registered_command.keys():
-                    @func_timeout.func_set_timeout(MashiroConfig().read()['CommandConfig']['MaxResponseTime'])
-                    def run_command():
-                        built_in.registered_command[args[0]](client)
 
-                    try:
-                        run_command()
-                    except func_timeout.exceptions.FunctionTimedOut:
-                        self.logger.warning('[WatchDog]Killed processing command {}'.format(args[0]))
-
-                # 调用钩子指令
-                for command in self.on_trigger_command:
-                    if command['command'] == args[0]:
-                        @func_timeout.func_set_timeout(command['max_time'])
-                        def run_command():
-                            command['target_func'](client)
-
-                        try:
-                            run_command()
-                        except func_timeout.exceptions.FunctionTimedOut:
-                            self.logger.warning('[WatchDog]Killed processing command {}'.format(args[0]))
-
-                # 调用主动式指令
-                for command in self.on_active_command:
                     def command_thread():
-                        @func_timeout.func_set_timeout(command['max_time'])
+                        @func_timeout.func_set_timeout(MashiroConfig().read()['CommandConfig']['MaxResponseTime'])
                         def _run_command():
-                            command['target_func'](client)
+                            built_in.registered_command[args[0]](client)
 
                         try:
                             _run_command()
@@ -151,9 +134,19 @@ class CqHttpClient(websocket.WebSocketApp):
                     thread.setDaemon(True)
                     thread.start()
 
-        except TypeError:
-            # 尚不明确错误原因
-            pass
+                # 调用钩子指令
+                if len(self.on_trigger_command) != 0:
+                    for command in self.on_trigger_command:
+                        if command['command'] == args[0]:
+                            run_command(command=command, client=client, logger=self.logger)
+
+                # 调用主动式指令
+                if len(self.on_active_command) != 0:
+                    for command in self.on_active_command:
+                        run_command(command=command, client=client, logger=self.logger)
+
+            except BaseException as r:
+                self.logger.error(r)
 
     def exit(self):
         """结束Websocket Client"""

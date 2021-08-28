@@ -62,9 +62,6 @@ class MashiroPlugin:
             if os.path.exists(installation_path):
                 # 如果目标路径存在原文件夹的话就先删除
                 shutil.rmtree(installation_path)
-            if not os.path.exists(installation_path):
-                # 如果目标路径不存在原文件夹的话就创建
-                os.makedirs(installation_path)
             shutil.copytree(os.path.join(self.plugin_temp_path, plugin_name), installation_path)
 
             # 安装配置文件

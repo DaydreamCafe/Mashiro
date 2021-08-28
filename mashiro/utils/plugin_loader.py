@@ -56,7 +56,7 @@ class PluginLoader:
                         self.logger.info('Initialized plugin: {}'.format(plugin['plugin_name']))
                     except NameError:
                         self.logger.info('No initialization function found in plugin: {}, skipped'
-                                     .format(plugin['plugin_name']))
+                                         .format(plugin['plugin_name']))
 
                     # 注册插件
                     self.logger.info('Registering plugin {}'.format(metadata['plugin_id']))

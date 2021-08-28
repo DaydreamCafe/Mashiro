@@ -59,17 +59,19 @@ class MashiroPlugin:
         if plugin_metadata not in installed_plugin_list:
             # 安装
             installation_path = os.path.join(self.plugin_path, plugin_metadata['plugin_id'])
-            if not os.path.exists(installation_path):
-                # 如果目标路径不存在原文件夹的话就创建
-                os.makedirs(installation_path)
             if os.path.exists(installation_path):
                 # 如果目标路径存在原文件夹的话就先删除
                 shutil.rmtree(installation_path)
+            if not os.path.exists(installation_path):
+                # 如果目标路径不存在原文件夹的话就创建
+                os.makedirs(installation_path)
             shutil.copytree(os.path.join(self.plugin_temp_path, plugin_name), installation_path)
 
             # 安装配置文件
             config_path = metadata['config_path']
             if config_path != '':
+                if os.path.exists(os.path.join('./config', plugin_metadata['plugin_id'])):
+                    shutil.rmtree(os.path.join('./config', plugin_metadata['plugin_id']))
                 shutil.copytree(os.path.join(installation_path, config_path.replace('./', '', 1)),
                                 os.path.join('./config', plugin_metadata['plugin_id']))
                 shutil.rmtree(os.path.join(installation_path, config_path.replace('./', '', 1)))

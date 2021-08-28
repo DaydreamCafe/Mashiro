@@ -15,7 +15,7 @@ def run_command(command, client, logger):
         try:
             _run_command()
         except func_timeout.exceptions.FunctionTimedOut:
-            logger.warning('[WatchDog]Killed processing command {}'.format(args[0]))
+            logger.warning('[WatchDog]Killed processing command {}'.format(client.args[0]))
 
     thread = threading.Thread(target=command_thread)
     thread.setDaemon(True)

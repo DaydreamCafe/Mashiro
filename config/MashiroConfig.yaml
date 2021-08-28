@@ -1,10 +1,10 @@
 cqhttpConfig:
-  IpAddress: "192.168.0.100"
+  IpAddress: "127.0.0.1"
   Port: 6700
   Token: ""
 
 MashiroConfig:
-  ReactGroup: 798131705
+  ReactGroup: 114514
   SendingStackDepth: 10
   SendingInterval: 1
 
@@ -21,4 +21,4 @@ PluginConfig:
   PluginPath: "./plugins"
 
 DebugConfig:
-  LogLevel: "warning"
+  LogLevel: "DEBUG"

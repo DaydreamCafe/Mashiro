@@ -77,11 +77,12 @@ class MashiroPlugin:
             installed_plugin_list.append(plugin_metadata)
             self.write_plugin_list(installed_plugin_list)
 
-            self.logger.info('Successfully installed plugin: {}(ID:{})'.format(plugin_name, plugin_metadata['plugin_id']))
+            self.logger.info(
+                'Successfully installed plugin: {}(ID:{})'.format(plugin_name, plugin_metadata['plugin_id']))
         else:
             # 已安装时跳过安装
             self.logger.info('Already installed plugin {}(ID:{}),skipped the installation'
-                         .format(plugin_name, plugin_metadata['plugin_id']))
+                             .format(plugin_name, plugin_metadata['plugin_id']))
 
         # 清理
         shutil.rmtree(self.plugin_temp_path)

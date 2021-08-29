@@ -54,7 +54,7 @@ class PluginLoader:
                     try:
                         plugin_.init_plugin()
                         self.logger.info('Initialized plugin: {}'.format(plugin['plugin_name']))
-                    except NameError:
+                    except AttributeError:
                         self.logger.info('No initialization function found in plugin: {}, skipped'
                                          .format(plugin['plugin_name']))
 

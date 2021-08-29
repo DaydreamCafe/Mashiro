@@ -40,7 +40,7 @@ class CqHttpClient(websocket.WebSocketApp):
 
         # 连接至Websocket服务器
         self.logger.info('Now connecting to {}'.format(url))
-        super().__init__(url, on_message=self.on_message, on_open=self.on_open)
+        super().__init__(url, on_message=self.on_message)
 
         # 加载字符串解析器
         self.logger.debug('Parser loading phase')
@@ -97,9 +97,6 @@ class CqHttpClient(websocket.WebSocketApp):
         time.sleep(0.1)
         self.logger.debug('Starting to run go-cqhttp client')
         self.run_forever()
-
-    def on_open(self):
-        self.logger.info('Client started')
 
     def on_message(self, _, message):
         """消息调起的函数"""

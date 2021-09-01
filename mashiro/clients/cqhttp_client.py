@@ -14,11 +14,11 @@ from mashiro.utils.logger import Logger
 from mashiro.utils.parser_loader import ParserLoader
 from mashiro.utils.plugin_loader import PluginLoader
 from mashiro.utils.plugin_manager import MashiroPlugin
-from mashiro.api.interface import Interface
-from mashiro.utils.message_stack import MessageStack
-from mashiro.commands import built_in
 from mashiro.utils.config import MashiroConfig
 from mashiro.utils.command_thread import run_command
+from mashiro.utils.message_stack import MessageStack
+from mashiro.api.interface import Interface
+from mashiro.commands import built_in
 
 
 class CqHttpClient(websocket.WebSocketApp):
@@ -34,7 +34,7 @@ class CqHttpClient(websocket.WebSocketApp):
         self.client_to_query_stats = '1'
         self.client_to_query_online = '2'
         # websocket.enableTrace(True)
-        url = f'ws://{self.ws_address}:{self.ws_port}/'
+        url = 'ws://{}:{}/'.format(self.ws_address, self.ws_port)
         if self.access_token != '':
             url += '?access_token={}'.format(self.access_token)
 
